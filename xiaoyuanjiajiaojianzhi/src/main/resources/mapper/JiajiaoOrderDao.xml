@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.JiajiaoOrderDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.jiajiao_id as jiajiaoId
+        ,a.yonghu_id as yonghuId
+        ,a.jiajiao_time as jiajiaoTime
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.JiajiaoOrderView" >
+        SELECT
+        <include refid="Base_Column_List" />
+
+--         级联表的字段
+        ,jiajiao.jiajiao_name as jiajiaoName
+        ,jiajiao.sex_types as sexTypes
+        ,jiajiao.xuqiu_types as xuqiuTypes
+        ,jiajiao.jiajiao_id_number as jiajiaoIdNumber
+        ,jiajiao.jiajiao_phone as jiajiaoPhone
+        ,jiajiao.jiajiao_email as jiajiaoEmail
+        ,jiajiao.jiajiao_photo as jiajiaoPhoto
+        ,yonghu.yonghu_name as yonghuName
+        ,yonghu.sex_types as sexTypes
+        ,yonghu.yonghu_id_number as yonghuIdNumber
+        ,yonghu.yonghu_phone as yonghuPhone
+        ,yonghu.yonghu_email as yonghuEmail
+        ,yonghu.yonghu_photo as yonghuPhoto
+
+        FROM jiajiao_order  a
+        left JOIN jiajiao jiajiao ON a.jiajiao_id = jiajiao.id
+        left JOIN yonghu yonghu ON a.yonghu_id = yonghu.id
+
+        <where>
+            <if test="params.jiajiaoId != null">
+                and a.jiajiao_id = #{params.jiajiaoId}
+            </if>
+            <if test="params.yonghuId != null">
+                and a.yonghu_id = #{params.yonghuId}
+            </if>
+            <if test=" params.jiajiaoTimeStart != '' and params.jiajiaoTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.jiajiao_time) >= UNIX_TIMESTAMP(#{params.jiajiaoTimeStart}) ]]>
+            </if>
+            <if test=" params.jiajiaoTimeEnd != '' and params.jiajiaoTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.jiajiao_time) <= UNIX_TIMESTAMP(#{params.jiajiaoTimeEnd}) ]]>
+            </if>
+
+            <if test=" params.jiajiaoName != '' and params.jiajiaoName != null and params.jiajiaoName != 'null' ">
+                and jiajiao.jiajiao_name like CONCAT('%',#{params.jiajiaoName},'%')
+            </if>
+            <if test="params.sexTypes != null">
+                and jiajiao.sex_types = #{params.sexTypes}
+            </if>
+
+            <if test="params.xuqiuTypes != null">
+                and jiajiao.xuqiu_types = #{params.xuqiuTypes}
+            </if>
+
+            <if test=" params.jiajiaoIdNumber != '' and params.jiajiaoIdNumber != null and params.jiajiaoIdNumber != 'null' ">
+                and jiajiao.jiajiao_id_number like CONCAT('%',#{params.jiajiaoIdNumber},'%')
+            </if>
+            <if test=" params.jiajiaoPhone != '' and params.jiajiaoPhone != null and params.jiajiaoPhone != 'null' ">
+                and jiajiao.jiajiao_phone like CONCAT('%',#{params.jiajiaoPhone},'%')
+            </if>
+            <if test=" params.jiajiaoEmail != '' and params.jiajiaoEmail != null and params.jiajiaoEmail != 'null' ">
+                and jiajiao.jiajiao_email like CONCAT('%',#{params.jiajiaoEmail},'%')
+            </if>
+            <if test=" params.yonghuName != '' and params.yonghuName != null and params.yonghuName != 'null' ">
+                and yonghu.yonghu_name like CONCAT('%',#{params.yonghuName},'%')
+            </if>
+            <if test="params.sexTypes != null">
+                and yonghu.sex_types = #{params.sexTypes}
+            </if>
+
+            <if test=" params.yonghuIdNumber != '' and params.yonghuIdNumber != null and params.yonghuIdNumber != 'null' ">
+                and yonghu.yonghu_id_number like CONCAT('%',#{params.yonghuIdNumber},'%')
+            </if>
+            <if test=" params.yonghuPhone != '' and params.yonghuPhone != null and params.yonghuPhone != 'null' ">
+                and yonghu.yonghu_phone like CONCAT('%',#{params.yonghuPhone},'%')
+            </if>
+            <if test=" params.yonghuEmail != '' and params.yonghuEmail != null and params.yonghuEmail != 'null' ">
+                and yonghu.yonghu_email like CONCAT('%',#{params.yonghuEmail},'%')
+            </if>
+        </where>
+        order by a.${params.orderBy} desc
+    </select>
+
+</mapper>
